@@ -2,8 +2,7 @@ function result = test_no_v4_entrypoint_called()
 % TEST: v4 entry points must not be called from v5 code.
 V5_root = fileparts(fileparts(mfilename('fullpath')));
 src_files = dir(fullfile(V5_root,'**','*.m'));
-forbidden = {'run_gse_pipeline','main_geoenergy_pipeline',...
-    '+gse_report','+core/','VsPredict_Geoenergy_v4'};
+forbidden = {'main_numerical_pipeline','run_gate15','+core/'};
 violations = {};
 for fi=1:numel(src_files)
     fp=fullfile(src_files(fi).folder,src_files(fi).name);
