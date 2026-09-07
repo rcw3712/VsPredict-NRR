@@ -1,0 +1,2 @@
+MODEL,PROVENANCE_CLASS,HOLDOUT_R2,SELECTION_SET,NOTE
+ridge_stacker,V5_CORRECTED_REANALYSIS,-3.06220888181202,holdout_fold_5_n100,model_family_designated_in_v4_refit_with_v5_leakage_free_pipeline

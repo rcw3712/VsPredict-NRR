@@ -1,17 +1,30 @@
-# Proprietary data - never commit
-data/*.xlsx
-data/*.xls
-data/*.csv
+# Proprietary input data
+data/*
+!data/README.md
 
-# MATLAB binaries / generated artifacts
+# Numerical run archives and model binaries
+runs/
 *.mat
 *.asv
 *.autosave
 
-# OS / editor cruft
+# Temporary and staging outputs
+figures_staging/
+figures_final/
+*.bak
+*.tmp
+*.zip
+
+# MATLAB/user state
+slprj/
+codegen/
+*.prj
+*.mlx.autosave
+
+# OS and editor files
 .DS_Store
 Thumbs.db
+desktop.ini
 *.swp
-
-# Full run archive (only curated results/reference_outputs/ is tracked)
-runs/
+.vscode/
+.idea/

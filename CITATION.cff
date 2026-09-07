@@ -1,48 +1,52 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below, alongside the associated manuscript."
+message: "Please cite the software release and associated manuscript."
 type: software
-title: "VsPredict-Geoenergy: Leakage-Free Cross-Well Shear-Wave Velocity Prediction Pipeline"
+title: "VsPredict-Geoenergy: Corrected NRR v5 Cross-Well Shear-Wave Velocity Pipeline"
+version: "5.0.0"
+date-released: "2026-09-07"
 authors:
-  - family-names: Wibowo
-    given-names: Rahmat Catur
+  - family-names: "Wibowo"
+    given-names: "Rahmat Catur"
+    orcid: "https://orcid.org/0000-0003-2754-1803"
     affiliation: "Universitas Lampung"
-  - family-names: Mahli
-    given-names: Razki Alfatah Kahiru
+  - family-names: "Mahli"
+    given-names: "Razki Alfatah Khairu"
     affiliation: "Universitas Lampung"
-  - family-names: Kumalasari
-    given-names: Isti Nur
+  - family-names: "Kumalasari"
+    given-names: "Isti Nur"
     affiliation: "Universitas Lampung"
-  - family-names: Kurniawan
-    given-names: Andri
+  - family-names: "Kurniawan"
+    given-names: "Andri"
     affiliation: "Universitas Lampung"
-  - family-names: Husni
+  - family-names: "Husni"
     given-names: "Yayan Mi'rojul"
     affiliation: "Universitas Lampung"
-  - family-names: Mulyanto
-    given-names: Bagus Sapto
+  - family-names: "Mulyanto"
+    given-names: "Bagus Sapto"
     affiliation: "Universitas Lampung"
-  - family-names: Sarkowi
-    given-names: Muh
+  - family-names: "Sarkowi"
+    given-names: "Muh"
+    orcid: "https://orcid.org/0000-0001-8554-3407"
     affiliation: "Universitas Lampung"
 repository-code: "https://github.com/rcw3712/VsPredict-Geoenergy"
-license: MIT
+license: "MIT"
 preferred-citation:
   type: article
-  title: "Cross-Well Shear-Wave Velocity Prediction under Severe Covariate Shift: Leakage-Free Validation and Geomechanical Consequences"
+  title: "Cross-Well Shear-Wave Velocity Prediction under Severe Covariate Shift: External Validation and Geomechanical Consequences"
   authors:
-    - family-names: Wibowo
-      given-names: Rahmat Catur
-    - family-names: Mahli
-      given-names: Razki Alfatah Kahiru
-    - family-names: Kumalasari
-      given-names: Isti Nur
-    - family-names: Kurniawan
-      given-names: Andri
-    - family-names: Husni
+    - family-names: "Wibowo"
+      given-names: "Rahmat Catur"
+    - family-names: "Mahli"
+      given-names: "Razki Alfatah Khairu"
+    - family-names: "Kumalasari"
+      given-names: "Isti Nur"
+    - family-names: "Kurniawan"
+      given-names: "Andri"
+    - family-names: "Husni"
       given-names: "Yayan Mi'rojul"
-    - family-names: Mulyanto
-      given-names: Bagus Sapto
-    - family-names: Sarkowi
-      given-names: Muh
-  journal: "Geoenergy Science and Engineering"
-  status: submitted
+    - family-names: "Mulyanto"
+      given-names: "Bagus Sapto"
+    - family-names: "Sarkowi"
+      given-names: "Muh"
+  journal: "Natural Resources Research"
+  status: "submitted"

@@ -1,27 +1,29 @@
-function test_no_hardcoded_metrics()
-% Rule 1.6: No scientific results hard-coded in figure/caption/report code.
-here = fileparts(fileparts(mfilename('fullpath')));
-report_dirs = {fullfile(here,'+gse_report')};
-% Values that should come from frozen bundle, not be in source code
-forbidden_in_reports = {'-4\.99','-4\.925','0\.4272','0\.452','53\.6','7\.85','0\.4867'};
-found = {};
-for di = 1:numel(report_dirs)
-    m_files = dir(fullfile(report_dirs{di},'*.m'));
-    for fi = 1:numel(m_files)
-        fp = fullfile(m_files(fi).folder,m_files(fi).name);
-        content = fileread(fp);
-        for pi = 1:numel(forbidden_in_reports)
-            if ~isempty(regexp(content, forbidden_in_reports{pi},'once'))
-                found{end+1} = sprintf('%s: %s',m_files(fi).name,forbidden_in_reports{pi}); %#ok<AGROW>
+function result = test_no_hardcoded_metrics()
+% TEST: No literal scientific numerics in +nrr_report/*.m
+report_dir = fullfile(fileparts(mfilename('fullpath')),'..', '+nrr_report');
+if ~isfolder(report_dir)
+    result = struct('name','test_no_hardcoded_metrics','status','FAIL',...
+        'message','+nrr_report does not exist yet'); return
+end
+files = dir(fullfile(report_dir,'*.m'));
+patterns = {'-3\.9607','-7\.397','0\.6804','0\.6418'};
+violations = {};
+for fi = 1:numel(files)
+    txt = fileread(fullfile(report_dir, files(fi).name));
+    lines = strsplit(txt, newline);
+    for li = 1:numel(lines)
+        if startsWith(strtrim(lines{li}),'%'); continue; end
+        for pi = 1:numel(patterns)
+            if ~isempty(regexp(lines{li}, patterns{pi},'once'))
+                violations{end+1} = sprintf('%s L%d', files(fi).name, li);
             end
         end
     end
 end
-if isempty(found)
-    fprintf('[TEST] PASS test_no_hardcoded_metrics\n');
+if isempty(violations)
+    result = struct('name','test_no_hardcoded_metrics','status','PASS','message','Clean');
 else
-    fprintf('[TEST] FAIL — hard-coded metrics in report code:\n');
-    for fi=1:numel(found); fprintf('  %s\n',found{fi}); end
-    error('TestFail:HardcodedMetrics','%d violations',numel(found));
+    result = struct('name','test_no_hardcoded_metrics','status','FAIL',...
+        'message',strjoin(violations(1:min(3,end)),'; '));
 end
 end
