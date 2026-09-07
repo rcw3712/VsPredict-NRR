@@ -1,0 +1,9 @@
+ROLE,N,NOTE
+Well-A total,492,492 = 392 + 100
+Well-A development,392,outer CV training (k-1 folds)
+Well-A holdout,100,Level-1 selection set (fold 5)
+Well-B total,492,all rows
+Well-B exact duplicate,163,exact duplicates excluded from blind
+Well-B non-duplicate,329,non-duplicate rows
+Pop-A primary blind,329,non-dup with measured VS
+Pop-B diagnostic QC,236,Pop-A with Vp/Vs>=sqrt(2) [target-informed]

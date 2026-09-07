@@ -1,70 +1,109 @@
-# VsPredict-Geoenergy
+# VsPredict-Geoenergy — corrected NRR v5
 
-Reproducibility code for:
+Reproducibility code and non-sensitive reference outputs for:
 
-> Wibowo, R.C., Mahli, R.A.K., Kumalasari, I.N., Kurniawan, A., Husni, Y.M., Mulyanto, B.S., & Sarkowi, M. **Cross-Well Shear-Wave Velocity Prediction under Severe Covariate Shift: Leakage-Free Validation and Geomechanical Consequences.** Submitted to *Geoenergy Science and Engineering* (Elsevier).
+> Wibowo et al., **Cross-Well Shear-Wave Velocity Prediction under Severe Covariate Shift: External Validation and Geomechanical Consequences**. Manuscript prepared for *Natural Resources Research*.
 
-This repository contains the MATLAB pipeline used to develop, validate, and evaluate machine-learning models for predicting shear-wave velocity (Vs) from conventional well logs (GR, DT, NPHI, RHOB), with a leakage-free, depth-blocked, Well-A-only model-development protocol and a genuinely blind, non-overlapping cross-well evaluation on Well-B.
+This branch contains the corrected v5 analysis. The previous Geoenergy Science and Engineering submission is preserved in Git history and the `v4.0.0-gse-submission` tag.
 
-## What this repository contains
+## Scientific status
 
-| Path | Contents |
-|---|---|
-| `+core/` | Core pipeline: run initialization, data loading, preprocessing, feature selection, hyperparameter tuning, ablation study, I-CNN audit, run-freezing/validation |
-| `+models/` | Model implementations: PNN, MLFFNN, DFFNN, CNN1D (base learners); Ridge stacker, I-CNN, Hybrid I-CNN (meta-learners); Direct Ridge (post-hoc sensitivity model); LSBoost, SVR |
-| `+gse_report/` | Figure generation, manifest/caption generation, and QC checks used to produce the manuscript's figures and supplementary material |
-| `config/config_geoenergy_v4.m` | Master configuration (structural settings only — column mappings, feature lists, physical-QC ranges; **no hard-coded scientific results**) |
-| `tests/` | Pipeline integrity tests (no hard-coded metrics, no duplicate active functions, canonical-run identity, path uniqueness) |
-| `main_numerical_pipeline.m`, `run_pipeline.m`, `run_gate15.m` | Top-level entry points |
-| `results/reference_outputs/` | Non-sensitive summary tables and reports from the canonical frozen run (`run_20260723_170341`), matching the numbers reported in the manuscript — provided for independent verification of a re-run |
+- Provenance class: `V5_CORRECTED_REANALYSIS`
+- Canonical numerical run: `run_20260903_155408`
+- Model development: Well-A only
+- Primary external population: Pop-A, 329 depth-disjoint Well-B rows
+- Diagnostic population: Pop-B, 236 rows; **target-informed**
+- Primary model: Ridge stacker
+- Direct Ridge: **post-hoc sensitivity only**, not confirmatory
 
-## What is **not** included
+Pop-A comprises 93 rows recorded as “Pop-A primary blind” plus the 236 Pop-B rows in the canonical role ledger. Pop-B uses measured Vp/Vs for physical screening and cannot be treated as a deployment-time population when measured Vs is unavailable.
 
-- **Well-log data** (`data/Well-A.xlsx`, `data/Well-B.xlsx`): proprietary, provided under confidentiality agreement, and cannot be redistributed (see the manuscript's Data Availability statement). To run this pipeline, supply your own well-log data in the same column format (see `config/config_geoenergy_v4.m`, `cfg.data.col_map`).
-- **Trained model binaries** (`.mat` files): excluded to avoid distributing anything derived from the proprietary dataset.
-- **Full run archive**: only the canonical run's published summary tables/reports are included (`results/reference_outputs/`), not the complete intermediate run folder structure.
+## Canonical results
+
+| Quantity | Corrected v5 value |
+|---|---:|
+| Well-A development / historical holdout | 392 / 100 |
+| Shared-depth coordinates excluded | 163 |
+| Nested depth-blocked CV | 5 outer × 4 inner folds |
+| Pooled outer-OOF R² | 0.6632 |
+| Pooled outer-OOF RMSE | 0.0565 km/s |
+| Mean fold R² | 0.5526 ± 0.1246 |
+| Ridge stacker Pop-A R² | −2.6162 |
+| Ridge stacker Pop-B R² | −5.2708 |
+| Direct Ridge Pop-A / Pop-B R² | 0.6831 / 0.6504 |
+| DT shift z(B\|A) / KS | +7.85 / 1.000 |
+| Ridge Pop-B ALL-OK | 0 / 236 |
+| Direct Ridge Pop-B ALL-OK | 236 / 236 |
+| Cross-run reproducibility | 44 / 44 checks PASS |
+
+Negative external R² is a primary scientific result, not a software failure. Direct Ridge results are exploratory because the model was assessed after the primary analysis was locked.
+
+## Repository structure
+
+```text
+run_pipeline.m
+main_nrr_pipeline.m
+run_reproducibility_check.m
+config/config_nrr_v5.m
++nrr_data/       loading, role definition, folds, fold-local preprocessing
++nrr_models/     base learners, stacker, and post-hoc Direct Ridge
++nrr_eval/       nested CV, blind evaluation, diagnostics, bootstrap, freeze
++nrr_report/     post-Gate-18 report generation
+figure_scripts/  canonical-aware publication figure generators
+figures/publication/
+tests/
+results/reference_outputs_v5/
+```
 
 ## Reproducing the analysis
 
-1. Requires MATLAB (developed and frozen under **R2024a**, 24.1.0.2537033 — see `results/reference_outputs/RNG_AND_ENVIRONMENT_REPORT.md` and `CONFIG_SNAPSHOT.txt` for the exact environment used for the canonical run).
-2. Place your own well-log files at `data/Well-A.xlsx` and `data/Well-B.xlsx` (column names per `config/config_geoenergy_v4.m`).
-3. From the repository root, run:
-   ```matlab
-   run_pipeline
-   ```
-4. Cross-run reproducibility can be checked with:
-   ```matlab
-   run_gate15
-   ```
-   which reproduces the 23-check comparison reported in the manuscript (Table 6 / Gate-15).
-5. Figures and captions matching the manuscript are generated via the `+gse_report` package (see `+gse_report/generate_all.m`).
+Requirements: MATLAB R2024a and the required Statistics and Machine Learning, Deep Learning, and related toolboxes.
 
-## Key results (for verification against your own re-run)
+Place authorized input files at:
 
-All values below are from the canonical frozen run (`run_20260723_170341`) and are reported in full in the manuscript; see `results/reference_outputs/` for the underlying tables.
+```text
+data/Well-A.xlsx
+data/Well-B.xlsx
+```
 
-| Quantity | Value |
-|---|---|
-| Nested CV R² (Ridge stacker, Well-A) | 0.6418 ± 0.1486 |
-| Internal holdout R² (Well-A) | 0.2668 |
-| Blind R², Pop-A (n=329) | −3.9607 |
-| Blind R², Pop-B (n=236) | −7.3973 |
-| DT domain-shift z-score | +7.86 (100% out-of-distribution) |
-| Gate-15 cross-run reproducibility | 23 / 23 checks passed |
-| Direct Ridge (post-hoc) blind R², Pop-A / Pop-B | 0.6804 / 0.6599 |
+The expected schema is defined in `config/config_nrr_v5.m`. Then run:
 
-## Repository scope note
+```matlab
+clear classes
+run_pipeline
+```
 
-This pipeline evolved through several internal versions during development; some intermediate/legacy files referenced in historical development notes are not part of the active pipeline and are not included here. The files listed above under "What this repository contains" reflect the code paths actually used to produce the frozen canonical run and the manuscript's reported results.
+Run a second independent clean MATLAB session, then compare the two run IDs:
 
-## Citation
+```matlab
+result = run_reproducibility_check('run_ID_1','run_ID_2',pwd);
+```
 
-If you use this code, please cite the manuscript above. A `CITATION.cff` file is included for automated citation tools.
+Generate reports only after Gate 18 passes:
+
+```matlab
+nrr_report.generate_all('runs/run_ID_2',pwd);
+```
+
+After a canonical run is available locally, execute the 34 fail-hard repository checks:
+
+```matlab
+summary = run_integrity_tests();
+```
+
+## Data and artifact policy
+
+The well logs are proprietary and are not included. Trained model binaries, complete run folders, failed runs, row-level predictions, and row-level geomechanical files are also excluded. The repository provides non-sensitive aggregate tables, configuration metadata, canonical hashes, figures, and source code.
+
+The included summary outputs permit verification of reported values but do not make the analysis independently executable without authorized input data. This limitation must remain explicit in the manuscript and archive metadata.
+
+## Versioning
+
+- `v4.0.0-gse-submission`: historical GSE/v4 snapshot.
+- `v5.0.0-nrr-corrected-reanalysis`: corrected NRR analysis after release.
+- Future releases must not rewrite or replace earlier tagged versions.
+- A new Zenodo version should be minted from the v5 release.
 
 ## License
 
-See `LICENSE`. Code is released under the MIT License; this does **not** extend to any well-log data, which remains proprietary and is not distributed here.
-
-## Contact
-
-Rahmat Catur Wibowo — Geological Engineering Department, Universitas Lampung — rahmat.caturwibowo@eng.unila.ac.id
+Source code is released under the MIT License. The license does not apply to proprietary well-log data.

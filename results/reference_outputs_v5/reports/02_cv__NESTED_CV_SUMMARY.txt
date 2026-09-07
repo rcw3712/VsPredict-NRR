@@ -1,0 +1,3 @@
+Pooled OOF R2=0.6632 RMSE=0.0565
+Mean fold R2=0.5526+/-0.1246 SD
+NOTE: Pooled weights folds by size. Both reported per audit.
