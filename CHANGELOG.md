@@ -14,6 +14,6 @@
 
 This release changes reported numerical results relative to v4. It is a corrected reanalysis, not a cosmetic revision.
 
-## v4.0.0 — historical GSE submission
+## v4.0.0 — historical legacy submission
 
-Historical snapshot associated with the submission to *Geoenergy Science and Engineering*. Preserved for provenance; it is not the authoritative analysis for the NRR manuscript.
+Historical v4 snapshot preserved for provenance; it is not the authoritative analysis for the NRR manuscript.

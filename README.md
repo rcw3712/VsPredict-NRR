@@ -4,7 +4,7 @@ Reproducibility code and non-sensitive reference outputs for:
 
 > Wibowo et al., **Cross-Well Shear-Wave Velocity Prediction under Severe Covariate Shift: External Validation and Geomechanical Consequences**. Manuscript prepared for *Natural Resources Research*.
 
-This branch contains the corrected v5 analysis. The previous Geoenergy Science and Engineering submission is preserved in Git history and the `v4.0.0-gse-submission` tag.
+This branch contains the corrected v5 analysis prepared specifically for Natural Resources Research. The previous v4 analysis is preserved in Git history under the `v4.0.0-legacy` tag.
 
 ## Scientific status
 
@@ -99,7 +99,7 @@ The included summary outputs permit verification of reported values but do not m
 
 ## Versioning
 
-- `v4.0.0-gse-submission`: historical GSE/v4 snapshot.
+- `v4.0.0-legacy`: historical v4 snapshot retained only for provenance.
 - `v5.0.0-nrr-corrected-reanalysis`: corrected NRR analysis after release.
 - Future releases must not rewrite or replace earlier tagged versions.
 - A new Zenodo version should be minted from the v5 release.
