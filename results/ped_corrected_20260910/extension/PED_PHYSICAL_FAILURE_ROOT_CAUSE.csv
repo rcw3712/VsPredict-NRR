@@ -1,0 +1,4 @@
+ITEM,INTERPRETATION
+DEPENDENCY,"All screens share Vp, predicted Vs, and density; failures are not independent."
+VPVS_NU,"Vp/Vs >= sqrt(2) is algebraically equivalent to nu >= 0 under isotropic elasticity."
+INTERPRETATION,"nu >= 0 is an application-specific sedimentary-rock plausibility screen, not a universal stability condition."

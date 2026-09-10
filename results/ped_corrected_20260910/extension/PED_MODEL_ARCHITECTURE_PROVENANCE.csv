@@ -1,0 +1,11 @@
+COMPONENT,FINAL_VALUE,CANDIDATE_SPACE,SELECTION_MECHANISM,DATA_USED,BEFORE_OUTER_VAL,TUNED_INNER,FIXED_PRIOR,SOURCE_FILE,FUNCTION_NAME,STATUS
+PNN_spread,"0.50","0.1:0.1:2.0",INNER_CV_TUNED,"outer-training only",Yes,Yes,No,main_nrr_pipeline.m,select_model,INNER_CV_TUNED
+Ridge_lambda,"0.001","0.001,0.01,0.1,1,10",INNER_CV_TUNED,"outer-training only",Yes,Yes,No,main_nrr_pipeline.m,select_model,INNER_CV_TUNED
+MLFFNN_layers,"[64,32]","fixed",FIXED_FROM_PRIOR_DEVELOPMENT,"Well-A legacy",No,No,Yes,main_nrr_pipeline.m,build_mlffnn,FIXED_FROM_PRIOR_DEVELOPMENT
+DFFNN_layers,"[128,64,32]","fixed",FIXED_FROM_PRIOR_DEVELOPMENT,"Well-A legacy",No,No,Yes,main_nrr_pipeline.m,build_dffnn,FIXED_FROM_PRIOR_DEVELOPMENT
+CNN1D_filters,"32","fixed",FIXED_FROM_PRIOR_DEVELOPMENT,"Well-A legacy",No,No,Yes,main_nrr_pipeline.m,build_cnn1d,FIXED_FROM_PRIOR_DEVELOPMENT
+CNN1D_window,"16","fixed",FIXED_FROM_PRIOR_DEVELOPMENT,"Well-A legacy",No,No,Yes,main_nrr_pipeline.m,build_cnn1d,FIXED_FROM_PRIOR_DEVELOPMENT
+learning_rate,"1e-3","fixed",FIXED_FROM_PRIOR_DEVELOPMENT,"Well-A legacy",No,No,Yes,main_nrr_pipeline.m,build_*,FIXED_FROM_PRIOR_DEVELOPMENT
+Direct_Ridge_lam,"1.0","fixed",POST_HOC_EXPLORATORY,"Well-A only, post-hoc",No,No,Yes,main_nrr_pipeline.m,direct_ridge,POST_HOC_EXPLORATORY
+feature_set,"GR,DT,NPHI,RHOB","fixed",FIXED_A_PRIORI,"domain knowledge",Yes,No,No,main_nrr_pipeline.m,feature_select,FIXED_A_PRIORI
+resampling_rule,"0.1524m","fixed",FIXED_A_PRIORI,"domain knowledge",Yes,No,No,main_nrr_pipeline.m,resample,FIXED_A_PRIORI

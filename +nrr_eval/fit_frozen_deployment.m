@@ -35,8 +35,14 @@ for fo = 1:cfg.cv.n_outer
     % Canonical OOF seed: run_seed + fo * offset_fold + 100000
     % Identical between Gate 11 and Gate 16 for same run_seed
     oof_base_seed = run_seed + fo * cfg.seeds.offset_fold + 100000;
-    [bn_f, led_f] = nrr_models.fit_base_set(Xt, yt, hp, oof_base_seed, fo, cfg);
-    oof_full(vi,:) = nrr_models.predict_base_set(bn_f, Xv);
+    seg_t=nrr_data.depth_segment_ids(T_full(ti,:).(cfg.data.depth_col),cfg);
+    seg_v=nrr_data.depth_segment_ids(T_full(vi,:).(cfg.data.depth_col),cfg);
+    [bn_f, led_f] = nrr_models.fit_base_set(Xt, yt, hp, oof_base_seed, fo, cfg, seg_t);
+    assert(all(led_f.N_RETAINED_CROSS_SEGMENT==0), ...
+        'fit_frozen_deployment: cross-segment OOF training window retained');
+    [oof_full(vi,:),pa_f] = nrr_models.predict_base_set(bn_f, Xv, seg_v);
+    assert(pa_f.N_RETAINED_CROSS_SEGMENT==0, ...
+        'fit_frozen_deployment: cross-segment OOF prediction window retained');
     oof_seed_ledger{end+1} = led_f;
 end
 
@@ -53,12 +59,16 @@ assert(strcmp(stacker.input_space, 'standardized_meta'), ...
 % Seed: run_seed + 90000 (deployment refit, distinct from OOF seeds)
 deploy_base_seed = run_seed + 90000;
 rng(deploy_base_seed, 'twister');
+seg_full=nrr_data.depth_segment_ids(T_full.(cfg.data.depth_col),cfg);
 [base_nets, led_full] = nrr_models.fit_base_set(X_full, y_full, hp, ...
-    deploy_base_seed, 0, cfg);
+    deploy_base_seed, 0, cfg, seg_full);
+assert(all(led_full.N_RETAINED_CROSS_SEGMENT==0), ...
+    'fit_frozen_deployment: cross-segment full-fit window retained');
 
 %% Step 6: Round-trip test on training OOF
-meta_rt  = nrr_models.predict_base_set(base_nets, X_full);
-meta_rt_sc = nrr_models.apply_meta_scaler(meta_rt, meta_scaler);
+[~,pa_rt] = nrr_models.predict_base_set(base_nets, X_full, seg_full);
+assert(pa_rt.N_RETAINED_CROSS_SEGMENT==0, ...
+    'fit_frozen_deployment: round-trip cross-segment window retained');
 % Note: round-trip uses full refit base nets (not OOF), so RMSE != 0
 y_rt     = nrr_models.predict_ridge_stacker(stacker, oof_sc);
 ok_rt    = ~isnan(y_full);
@@ -80,7 +90,13 @@ deploy.oof_seed_policy = 'run_seed + fo*offset_fold + 100000';
 deploy.deploy_seed     = deploy_base_seed;
 deploy.roundtrip_rmse  = rt_rmse;
 deploy.primary_locked  = false;
-deploy.provenance      = 'V5_CORRECTED_REANALYSIS';
+deploy.segment_policy  = 'PHYSICAL_DEPTH_SEGMENTS';
+deploy.cnn_window_status = 'PASS_ZERO_RETAINED_CROSS_SEGMENT';
+if isfield(cfg,'runtime_provenance')
+    deploy.provenance=cfg.runtime_provenance;
+else
+    deploy.provenance='V5_CORRECTED_REANALYSIS';
+end
 
 % Seed ledger
 all_led = vertcat(oof_seed_ledger{:});

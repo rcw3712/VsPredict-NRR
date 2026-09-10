@@ -1,0 +1,2 @@
+MODEL,STATUS,LAMBDA,CONSTRAINT,NOTE
+direct_ridge,POST_HOC_SENSITIVITY,1,cannot_redefine_primary_analysis,requires_independent_third_well_confirmation
