@@ -1,4 +1,6 @@
-# Corrected-v5 reference outputs
+# Historical reference outputs
+
+> **Historical snapshot.** These files correspond to canonical run `run_20260903_155408` and are retained only for provenance. They do not reproduce the current PED manuscript. Use [`results/ped_corrected_20260910`](../ped_corrected_20260910) for the authoritative PED aggregate outputs.
 
 These files are curated, non-sensitive summaries from canonical run `run_20260903_155408`.
 
