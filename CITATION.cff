@@ -1,9 +1,9 @@
 cff-version: 1.2.0
-message: "Please cite the software release and associated manuscript."
+message: "Please cite the versioned PED software release and associated manuscript."
 type: software
-title: "VsPredict-Geoenergy: Corrected NRR v5 Cross-Well Shear-Wave Velocity Pipeline"
-version: "5.0.0"
-date-released: "2026-09-07"
+title: "VsPredict: corrected two-well cross-well shear-wave velocity pipeline"
+version: "2026.09-ped-corrected"
+date-released: "2026-09-10"
 authors:
   - family-names: "Wibowo"
     given-names: "Rahmat Catur"
@@ -28,11 +28,11 @@ authors:
     given-names: "Muh"
     orcid: "https://orcid.org/0000-0001-8554-3407"
     affiliation: "Universitas Lampung"
-repository-code: "https://github.com/rcw3712/VsPredict-Geoenergy"
+repository-code: "https://github.com/rcw3712/VsPredict-NRR"
 license: "MIT"
 preferred-citation:
   type: article
-  title: "Cross-Well Shear-Wave Velocity Prediction under Severe Covariate Shift: External Validation and Geomechanical Consequences"
+  title: "Two-well evaluation of shear-wave velocity transfer under severe log-distribution shift: Validation hierarchy and physical-admissibility assessment"
   authors:
     - family-names: "Wibowo"
       given-names: "Rahmat Catur"
@@ -48,5 +48,5 @@ preferred-citation:
       given-names: "Bagus Sapto"
     - family-names: "Sarkowi"
       given-names: "Muh"
-  journal: "Natural Resources Research"
-  status: "submitted"
+  journal: "Petroleum Exploration and Development"
+  status: "manuscript"

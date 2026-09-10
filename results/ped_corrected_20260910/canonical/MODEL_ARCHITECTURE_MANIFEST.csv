@@ -1,0 +1,6 @@
+MODEL,TYPE,HP_SUMMARY
+pnn,pnn,spread=0.50 [INNER_CV_TUNED_STACKED]
+mlffnn,mlffnn,hidden=[64  32] lr=1e-03 [FIRST_IMPLEMENTATION]
+dffnn,dffnn,hidden=[128   64   32] lr=1e-03 [FIRST_IMPLEMENTATION]
+cnn1d,cnn1d,filters=32 W=16 lr=1e-03 [FIRST_IMPLEMENTATION]
+ridge_stacker,ridge_stacker,lambda=0.0010 intercept_not_penalized [INNER_CV_TUNED_STACKED]

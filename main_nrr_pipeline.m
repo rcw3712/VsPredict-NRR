@@ -13,9 +13,19 @@ addpath(repo_root);
 addpath(fullfile(repo_root,'config'));
 cfg=config_nrr_v5();
 seed=cfg.seeds.canonical;
+run_prefix='run';
+provenance='V5_CORRECTED_REANALYSIS';
 for k=1:2:numel(varargin)
-    if strcmp(varargin{k},'seed'); seed=varargin{k+1}; end
+    switch lower(string(varargin{k}))
+        case "seed"; seed=varargin{k+1};
+        case "run_prefix"; run_prefix=char(varargin{k+1});
+        case "provenance"; provenance=char(varargin{k+1});
+        otherwise; error('main_nrr_pipeline: unknown option %s',string(varargin{k}));
+    end
 end
+cfg.runtime_provenance=provenance;
+assert(~isempty(regexp(run_prefix,'^[A-Za-z0-9_-]+$','once')), ...
+    'main_nrr_pipeline: invalid run_prefix');
 rng(seed,'twister');
 
 sep=repmat('=',1,60);
@@ -24,7 +34,8 @@ fprintf('  Seed: %d | Canonical: %d\n\n',seed,cfg.seeds.canonical);
 
 %% Initialize run struct
 run=struct();
-run.id     =sprintf('run_%s',datestr(now,'yyyymmdd_HHMMSS'));
+run.id     =sprintf('%s_%s',run_prefix,datestr(now,'yyyymmdd_HHMMSS'));
+run.provenance=provenance;
 run.seed   =seed;
 run.folder =fullfile(repo_root,cfg.out.runs_dir,run.id);
 run.gate   =struct();
@@ -119,13 +130,13 @@ gpass(run,'GATE_6','Gate 6: Inner HP tuning');
 gpass(run,'GATE_7','Gate 7: Outer-fold prediction');
 gpass(run,'GATE_8','Gate 8: OOF assembly');
 
-%% GATE 9 — Historical provenance (V5_CORRECTED_REANALYSIS label)
-run=nrr_eval.gate9_provenance(run,cfg);
-gpass(run,'GATE_9','Gate 9: Historical provenance');
-
-%% GATE 10 — Canonical HP policy
+%% GATE 10 — Canonical HP policy must precede holdout evaluation
 run=nrr_eval.gate10_canonical_hp(run,cfg);
 gpass(run,'GATE_10','Gate 10: Canonical HP');
+
+%% GATE 9 — Corrected holdout using the selected canonical HP
+run=nrr_eval.gate9_provenance(run,cfg);
+gpass(run,'GATE_9','Gate 9: Corrected canonical-HP holdout');
 
 %% GATE 11 — Freeze deployment on full Well-A n=492
 run=nrr_eval.gate11_freeze_deployment(run,cfg);

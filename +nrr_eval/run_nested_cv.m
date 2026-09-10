@@ -48,8 +48,11 @@ for fo=1:k
     % 7b: full base learners on outer-train
     pm_otr=nrr_data.fit_pm(T_otr,cfg);
     [X_otr,y_otr]=nrr_data.apply_pm_deploy(T_otr,pm_otr,cfg);
+    seg_otr=nrr_data.depth_segment_ids(T_otr.(cfg.data.depth_col),cfg);
     [base_nets,led2]=nrr_models.fit_base_set(X_otr,y_otr,best_hp,...
-        cfg.seeds.canonical,fo,cfg);
+        cfg.seeds.canonical,fo,cfg,seg_otr);
+    assert(all(led2.N_RETAINED_CROSS_SEGMENT==0), ...
+        '[G7] cross-segment CNN training window retained');
     seed_ledger{end+1}=led2;
 
     % 7c: fit meta_scaler on inner OOF (training data only — P0-1)
@@ -63,7 +66,10 @@ for fo=1:k
 
     % 7e: predict outer-val using single API (P0-1 fix)
     [X_ov,y_ov]=nrr_data.apply_pm(T_ov,pm_otr,cfg);
-    meta_ov=nrr_models.predict_base_set(base_nets,X_ov);
+    seg_ov=nrr_data.depth_segment_ids(T_ov.(cfg.data.depth_col),cfg);
+    [meta_ov,pred_audit]=nrr_models.predict_base_set(base_nets,X_ov,seg_ov);
+    assert(pred_audit.N_RETAINED_CROSS_SEGMENT==0, ...
+        '[G7] cross-segment CNN validation window retained');
     meta_ov_sc=nrr_models.apply_meta_scaler(meta_ov,meta_scaler);  % same scaler
     y_pred_ov=nrr_models.predict_ridge_stacker(stacker,meta_ov_sc);% single API
 
@@ -93,6 +99,7 @@ run.cv.sd_rmse     =std([fold_metrics.rmse]);
 run.cv.fold_metrics=fold_metrics; run.cv.fold_hp=fold_hp;
 run.cv.oof_pred=oof_pred; run.cv.oof_true=oof_true; run.cv.oof_ids=oof_ids;
 run.cv.base_oof=base_oof;
+run.cv.cnn_window_status='PASS_ZERO_RETAINED_CROSS_SEGMENT';
 
 writetable(table(oof_ids,oof_true,oof_pred,'VariableNames',...
     {'ROW_ID','VS_measured','VS_pred_OOF'}),...

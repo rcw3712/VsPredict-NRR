@@ -1,0 +1,4 @@
+LEVEL,DESCRIPTION,R2
+Nested_CV,Development_interval,0.638599805777719
+Same_well_holdout,Contiguous_depth_extrapolation,0.359126191424547
+Cross_well_PopA,External_transfer,-2.73306581051975

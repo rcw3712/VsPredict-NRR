@@ -1,0 +1,2 @@
+PARAMETER_1,PARAMETER_2,PARAMETER_3,PARAMETER_4,PARAMETER_5,PARAMETER_6,PARAMETER_7,PARAMETER_8,PARAMETER_9,PARAMETER_10,PARAMETER_11,VALUE_1,VALUE_2,VALUE_3,VALUE_4,VALUE_5,VALUE_6,VALUE_7,VALUE_8,VALUE_9,VALUE_10,VALUE_11
+condition,primary_pop,full_b_valid,full_b_status,n_exact_full,n_pred_only,n_depth_only,n_no_match,n_total_classified,canonical_n_shared,notes,"A","Pop-A (n=329, depth-disjoint)","0","CONTAMINATED_DIAGNOSTIC_NOT_FOR_PERFORMANCE_CLAIMS","163","0","0","329","492","163","163 PREDICTOR_AND_TARGET_EXACT found — Condition A applies."

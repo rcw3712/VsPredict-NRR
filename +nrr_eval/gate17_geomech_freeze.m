@@ -17,7 +17,7 @@ d_B   =T_B.(cfg.data.depth_col)(popB);
 id_B  =T_B.(cfg.data.id_col)(popB);
 
 models_to_eval=struct(...
-    'ridge_stacker',struct('y',run.blind.y_raw,  'status','V5_CORRECTED_REANALYSIS'),...
+    'ridge_stacker',struct('y',run.blind.y_raw,  'status',run.provenance),...
     'direct_ridge', struct('y',run.posthoc.y_pred,'status',cfg.dr.status));
 
 geo_rows={}; fail_rows_all={};
@@ -107,9 +107,12 @@ writetable(table(T_B.(cfg.data.id_col)(mask6),T_B.(cfg.data.depth_col)(mask6),..
     fullfile(fig_src,'FIG06_blind_eval.csv'));
 
 %% Numerical summary
-fid=fopen(fullfile(out8,'NRR_NUMERICAL_RESULTS_SUMMARY.md'),'w');
+summary_path=fullfile(out8,'NRR_NUMERICAL_RESULTS_SUMMARY.md');
+fid=fopen(summary_path,'w');
+assert(fid>=0,'[G17] Cannot open numerical summary for writing: %s',summary_path);
+summary_cleanup=onCleanup(@() close_if_open(fid));
 fprintf(fid,'# NRR_NUMERICAL_RESULTS_SUMMARY\n\nRun: %s | Seed: %d\n',run.id,run.seed);
-fprintf(fid,'\n## Provenance\nAll results: V5_CORRECTED_REANALYSIS\n');
+fprintf(fid,'\n## Provenance\nAll results: %s\n',run.provenance);
 fprintf(fid,'P0-1 bug FIXED (meta_scaler consistent across fit/predict)\n');
 fprintf(fid,'P0-2 bug FIXED (ALL_OK includes Vp/Vs gate)\n');
 fprintf(fid,'P0-3: stacker lambda tuned via full stacked pipeline\n\n');
@@ -127,33 +130,39 @@ fprintf(fid,'\n## Post-Hoc Direct Ridge (%s)\n',cfg.dr.status);
 fprintf(fid,'Pop-A R²=%.4f (n=%d)\nPop-B R²=%.4f (n=%d)\n',...
     run.posthoc.popA.r2,run.posthoc.popA.n,...
     run.posthoc.popB.r2,run.posthoc.popB.n);
-%% Freeze: save provisional artifacts (Gate 17 still PENDING_MANIFEST)
-run.gate.GATE_17 = 'PENDING_MANIFEST';
-run.frozen_at    = datestr(now);
+close_status=fclose(fid);
+assert(close_status==0,'[G17] Failed to close numerical summary: %s',summary_path);
+clear summary_cleanup;
 
-%% Frozen MAT (provisional — will be overwritten with PASS status if manifest succeeds)
+%% Freeze final artifacts before hashing them.
+% Gate 17 is recorded as PASS in the immutable numerical artifact. The run
+% becomes canonical only after the subsequently written manifest is read
+% back, every entry is re-hashed, and the atomic pointer is updated.
+run.gate.GATE_17 = 'PASS';
+run.frozen_at    = datestr(now);
 save(fullfile(out8,'FROZEN_NUMERICAL_RUN.mat'),'run','-v7.3');
 deploy=run.deploy; posthoc=run.posthoc;
 save(fullfile(out8,'FROZEN_MODEL_ARTIFACTS.mat'),'deploy','posthoc','-v7.3');
 
-%% RUN_MANIFEST_SHA256.csv — generated AFTER all artifacts, excludes self
-%% Gate 17 status is FAIL/PENDING until this block succeeds
+%% RUN_MANIFEST_SHA256.csv — generated only after all tracked files are stable.
+manifest_path=fullfile(out8,'RUN_MANIFEST_SHA256.csv');
+manifest_tmp =[manifest_path '.tmp'];
 try
     man_rows=nrr_eval.compute_sha256_manifest(run.folder,run.env.repo_root);
-    writetable(man_rows,fullfile(out8,'RUN_MANIFEST_SHA256.csv'));
+    writetable(man_rows,manifest_tmp,'FileType','text');
+    verify_report=nrr_eval.verify_sha256_manifest(...
+        manifest_tmp,run.folder,run.env.repo_root);
+    [ok_manifest,msg_manifest]=movefile(manifest_tmp,manifest_path,'f');
+    assert(ok_manifest,'[G17] Atomic manifest update failed: %s',msg_manifest);
     fprintf('[G17] Manifest: %d entries\n',height(man_rows));
+    fprintf('[G17] Manifest read-back verification: %d/%d hashes PASS\n',...
+        verify_report.n_verified,verify_report.n_total);
 catch ME
     run.gate.GATE_17        = 'FAIL';
     run.gate.GATE_17_REASON = ME.message;
     save(fullfile(out8,'FAILED_RUN_STATE.mat'),'run','-v7.3');
     error('[G17] MANIFEST_FAIL: %s\nFix before Gate 18.',ME.message);
 end
-
-%% Set Gate 17 PASS — only after manifest succeeds
-run.gate.GATE_17 = 'PASS';
-
-%% Re-save frozen MAT with PASS status
-save(fullfile(out8,'FROZEN_NUMERICAL_RUN.mat'),'run','-v7.3');
 
 %% Atomic canonical pointer update — ABSOLUTE LAST action
 pointer_path = fullfile(run.env.repo_root,'runs','CANONICAL_RUN_POINTER.txt');
@@ -171,4 +180,11 @@ n_all_dr    = geo_rows{2}{11};
 n_eval      = geo_rows{1}{3};    % N_EVAL
 fprintf('[G17] PASS | INVARIANTS_PASS ridge=1 direct_ridge=1 | ALL_OK ridge=%d/%d DR=%d/%d | frozen\n',...
     n_all_ridge, n_eval, n_all_dr, n_eval);
+end
+
+function close_if_open(fid)
+% Close the summary on every error path without double-closing it.
+if isnumeric(fid) && isscalar(fid) && any(openedFiles==fid)
+    fclose(fid);
+end
 end
